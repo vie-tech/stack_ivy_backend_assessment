@@ -1,0 +1,21 @@
+{
+  "name": "api-service",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "axios": "^1.7.2",
+    "moleculer": "^0.14.33",
+    "moleculer-web": "^0.10.7",
+    "nats": "^2.26.0",
+    "nodemailer": "^6.9.13",
+    "twilio": "^5.1.0"
+  }
+}
