@@ -7,42 +7,40 @@ module.exports = {
       const amountToDeduct = Number(ctx.params.amountToDeduct);
 
       // Input validation
-      if (typeof amountToDeduct !== "number" || amountToDeduct <= 0) {
-        return { message: "Invalid amount to deduct" } //FOR UI RESPONSE AND CLIENT ERROR DISPLAY
+      if (isNaN(amountToDeduct) || amountToDeduct <= 0) {
+        return { message: "Invalid amount to deduct" }; // For UI response and client error display
       }
+
       try {
-        const user = await ctx.call("user.getCurrentUser");
-        // Check if user exists and has a balance property (Incase user account might be blocked)
-        if (!user.success) {
-          this.logger.info("User not signed in") //FOR DEV
-          return { message: "User not found or balance is unavailable" }; //FOR UI RESPONSE AND CLIENT ERROR DISPLAY
+        const response = await ctx.call("user.getCurrentUser");
+        if (!response.success)
+          return this.logger.error("Cannnot get user object");
+        const user = await response.user;
+        // Check if user exists and has a balance property (In case user account might be blocked)
+        if (typeof user.balance !== "number") {
+          this.logger.info("User not signed in or balance unavailable"); // For dev
+          return { message: "User not found or balance is unavailable" }; // For UI response and client error display
         }
 
-        if (amountToDeduct > user.balance) {
+        const transactionProcess = await this.deductBalance(
+          user,
+          amountToDeduct
+        );
+
+        if (!transactionProcess.success) {
           await ctx.call("notification.sendInsufficientNotifToUser", {
-            userId: user.id,
-          });
-
-          return { message: "Could not deduct amount: insufficient funds" };
-        } else {
-          const transactionProcess = await this.deductBalance(
-            ctx,
             user,
-            amountToDeduct
-          );
-          if (!transactionProcess.success) {
-            await ctx.call("notification.sendInsufficientNotifToUser", {
-              userId: user.id,
-            });
-            return { message: transactionProcess.message };
-          }
-          await ctx.call("notification.sendDebitNotifToUser", {
-            userId: user.id,
+            amountToDeduct,
           });
-          return { message: "Amount deducted successfully" };
+          return { message: transactionProcess.message };
         }
+
+        await ctx.call("notification.sendDebitNotifToUser", {
+          userId: user.id,
+          newBalance,
+        });
+        return { message: transactionProcess.message };
       } catch (error) {
-        // Log the error and return a message
         ctx.broker.logger.error("Failed to trigger debit:", error.message);
         return {
           message: "An error occurred while processing the debit",
@@ -50,19 +48,36 @@ module.exports = {
         };
       }
     },
+  },
 
-    methods: {
-      async deductBalance(user, amountToDeduct) {
-        const newBalance = user.balance - amountToDeduct;
-        if (!newBalance < 0) {
-          //ADDING FURTHER BALANCE CONFIRMATION FOR EXTRA SAFETY
+  methods: {
+    async deductBalance(user, amountToDeduct) {
+      const newBalance = user.balance - amountToDeduct;
 
-          return {
-            success: false,
-            message: "Insufficient balance, please recharge and try again",
-          };
-        }
-      },
+      if (newBalance < 0) {
+        return {
+          success: false,
+          message: "Insufficient balance, please recharge and try again",
+        };
+      }
+
+      try {
+        // Mock a balance deduction action that involves mutating a database service
+
+        // Log the balance deduction for auditing purposes
+        this.logger.info(
+          `Deducted ${amountToDeduct} from user ${user.id}. New balance: ${newBalance}`
+        );
+
+        return {
+          success: true,
+          message: `Amount debited successfully, see you soon :)`,
+          newBalance,
+        };
+      } catch (error) {
+        this.logger.error("Failed to deduct balance:", error.message);
+        throw new Error("Failed to deduct balance");
+      }
     },
   },
 };

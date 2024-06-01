@@ -14,14 +14,19 @@ module.exports = {
     name: 'notification',
     actions: {
         async sendInsufficientNotifToUser(ctx){
-            
+          const {user, amountToDedut} = ctx.params
+          if(!user) return this.logger.error('Valid user object not passed')
             const info = await transporter.sendMail({
-                from: '"Maddison Foo Bar 👻" <maddison53@ethereal.email>', 
-                to: ctx.params.users, // list of receivers
-                subject: "Email notification", // Subject line
-                text: "Hello world?", // plain text body
-                html: "<b>Hello world?</b>", // html body
+                from: '"Maddison" <maddison53@ethereal.email>', 
+                to: user.email, // list of receivers
+                subject: "Failed debit Transaction", // Subject line
+                text: `Debit transaction of ${amountToDedut} failed`, // plain text body
+                
               });
+        },
+
+       async sendDebitNotifToUser(ctx){
+             
         }
     }
 }
