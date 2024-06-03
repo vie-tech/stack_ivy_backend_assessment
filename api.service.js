@@ -19,6 +19,7 @@ module.exports = {
                     "user/login": "user.setCurrentUser",
                     "user/balance": "user.getUserBalance",
                     '/transaction/debit': "transaction.triggerDebit",
+                    'POST /user/signup':   "database.createUser"
                     
                 },
 

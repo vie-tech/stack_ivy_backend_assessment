@@ -21,12 +21,27 @@ module.exports = {
                 to: user.email, // list of receivers
                 subject: "Failed debit Transaction", // Subject line
                 text: `Debit transaction of ${amountToDedut} failed`, // plain text body
-                
+                html: this.mail_body
               });
         },
 
        async sendDebitNotifToUser(ctx){
              
         }
+    },
+
+    created(){
+      this.mail_body = `
+      <html>
+        <body>
+          <p>Dear ${user.name},</p>
+          <p>Your debit transaction of <strong>${amount}</strong> has failed due to insufficient funds.</p>
+          <p>Please ensure you have enough balance and try again.</p>
+          <br>
+          <p>Best regards,</p>
+          <p>Your Service Team</p>
+        </body>
+      </html>
+    `;
     }
 }
