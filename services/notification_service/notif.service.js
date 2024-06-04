@@ -1,47 +1,12 @@
-const nodemailer = require('nodemailer')
-const transporter = nodemailer.createTransport({
-    host: "smtp.ethereal.email",
-    port: 587,
-    secure: false, // Use `true` for port 465, `false` for all other ports
-    auth: {
-      user: "maddison53@ethereal.email",
-      pass: "jn7jnAPss4f63QBp6D",
-    },
-  });
-
+const {sendInsufficientNotifToUser, successfulDeposit} = require('./controller/notif.controller')
 module.exports = {
 
     name: 'notification',
     actions: {
-        async sendInsufficientNotifToUser(ctx){
-          const {user, amountToDedut} = ctx.params
-          if(!user) return this.logger.error('Valid user object not passed')
-            const info = await transporter.sendMail({
-                from: '"Maddison" <maddison53@ethereal.email>', 
-                to: user.email, // list of receivers
-                subject: "Failed debit Transaction", // Subject line
-                text: `Debit transaction of ${amountToDedut} failed`, // plain text body
-                html: this.mail_body
-              });
-        },
-
-       async sendDebitNotifToUser(ctx){
-             
-        }
+        sendInsufficientNotifToUser,
+        successfulDeposit
     },
 
     created(){
-      this.mail_body = `
-      <html>
-        <body>
-          <p>Dear ${user.name},</p>
-          <p>Your debit transaction of <strong>${amount}</strong> has failed due to insufficient funds.</p>
-          <p>Please ensure you have enough balance and try again.</p>
-          <br>
-          <p>Best regards,</p>
-          <p>Your Service Team</p>
-        </body>
-      </html>
-    `;
     }
 }

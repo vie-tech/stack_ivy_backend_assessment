@@ -1,33 +1,33 @@
-const mockDatabase = require('../../database/mock.database').database
-let currentUser;
+const { createUser, getUserBalance, userLogin } = require("./controller/user.controller");
+const mongoose = require("mongoose");
+
 module.exports = {
-    name: 'user',
-    actions: {
-       async getCurrentUser(ctx){
-        if(!currentUser){
-            return {success: false, message: 'user not signed in'}
-        }
-         return {success: true, currentUser};
-       },
+  name: "user",
+  actions: {
+    createUser,
+    getUserBalance,
+    userLogin
+  },
 
-       async setCurrentUser(ctx) {  //emulating the login function
-          const fetchedUser = mockDatabase.find((user) => user.id == ctx.params.userId);
-          currentUser = fetchedUser;
-          this.logger.info(`You are logged in with ${currentUser.name}`)
-      },
+  started() {
+    mongoose
+      .connect(process.env.MONGO_URI)
+      .then(() => {
+        this.logger.info("Database connection established");
+      })
+      .catch((err) => {
+        this.logger.error(err.message);
+      });
+  },
 
-      async getUserBalance(){
-        if(!currentUser){
-            return 'Please sign in to retrieve your user balance'
-        }
-
-        return currentUser.balance;
-      },  
-
-      async userDepositM(ctx){
-
-      }
-    },
-
-    
-}
+  stopped() {
+    mongoose
+      .disconnect()
+      .then(() => {
+        this.logger.info("Disconnected from MongoDB");
+      })
+      .catch((err) => {
+        this.logger.error("Failed to disconnect from MongoDB", err);
+      });
+  },
+};

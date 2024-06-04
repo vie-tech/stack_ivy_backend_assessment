@@ -17,15 +17,16 @@ module.exports = {
                     "/user": "user.getCurrentUser",
                     "/wallet" : "wallet.walletBalance",
                     "user/login": "user.setCurrentUser",
-                    "user/balance": "user.getUserBalance",
+                    "/user/balance": "wallet.getWalletBalance",
                     '/transaction/debit': "transaction.triggerDebit",
-                    'POST /user/signup':   "database.createUser"
+                    'POST /user/signup':   "user.createUser",
+                    "/user/debit": "wallet.triggerDebit",
                     
                 },
 
                 // Enable CORS
                 cors: {
-                    origin: "*",
+                    origin: "*", //replace with frontend url if it was a real project
                     methods: ["GET", "OPTIONS", "POST", "PUT", "DELETE"],
                     allowedHeaders: ["Content-Type", "Authorization"],
                 },

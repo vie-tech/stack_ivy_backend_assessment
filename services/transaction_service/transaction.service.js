@@ -1,4 +1,3 @@
-const { methods } = require("../../api.service");
 
 module.exports = {
   name: "transaction",
@@ -49,6 +48,8 @@ module.exports = {
       }
     },
   },
+
+  
 
   methods: {
     async deductBalance(user, amountToDeduct) {

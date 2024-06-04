@@ -1,9 +1,10 @@
+const {triggerDebit, getWalletBalance, createWallet} = require('./controller/wallet.controller')
 
 module.exports = {
     name: 'wallet',
     actions: {
-       async walletBalance(){
-        return 'from the wallet'
-       }
+       triggerDebit,
+       getWalletBalance,
+       createWallet
     }
 }
