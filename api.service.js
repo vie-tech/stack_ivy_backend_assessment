@@ -13,14 +13,13 @@ module.exports = {
                 path: "/api",
 
                 aliases: {
-                    "POST /notify": "notification.notify",
-                    "/user": "user.getCurrentUser",
+                    
                     "/wallet" : "wallet.walletBalance",
                     "user/login": "user.setCurrentUser",
                     "/user/balance": "wallet.getWalletBalance",
-                    '/transaction/debit': "transaction.triggerDebit",
-                    'POST /user/signup':   "user.createUser",
+                    'POST /user/signup': "user.createUser",
                     "/user/debit": "wallet.triggerDebit",
+                    'PUT /user/credit': "wallet.addMoneyToWallet"
                     
                 },
 

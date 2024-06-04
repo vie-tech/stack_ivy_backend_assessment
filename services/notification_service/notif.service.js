@@ -1,10 +1,11 @@
-const {sendInsufficientNotifToUser, successfulDeposit} = require('./controller/notif.controller')
+const {sendInsufficientNotifToUser, successfulDeposit, creditAlert} = require('./controller/notif.controller')
 module.exports = {
 
     name: 'notification',
     actions: {
         sendInsufficientNotifToUser,
-        successfulDeposit
+        successfulDeposit,
+        creditAlert
     },
 
     created(){

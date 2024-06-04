@@ -1,7 +1,12 @@
 const nodemailer = require("nodemailer");
 const twilio = require("twilio");
 const { parseMessage, successfulMessage } = require("../helper/email.message");
-const { successfulMobileMessage, failedMobileMessage } = require("../helper/mobile.messages");
+const {
+  successfulMobileMessage,
+  failedMobileMessage,
+} = require("../helper/mobile.messages");
+const {successfulCreditMessage} = require('../helper/credit.message')
+const messaging = require('../../../firebase/firebase.config')
 const accountSID = process.env.TWILO_SID;
 const token = process.env.TWILO_AUTH_TOKEN;
 require("dotenv").config();
@@ -34,7 +39,7 @@ const sendInsufficientNotifToUser = async (ctx) => {
       });
       console.log(info);
     } else if (notifType === "mobile") {
-      const mobileContent = failedMobileMessage(user, amountToDeduct)
+      const mobileContent = failedMobileMessage(user, amountToDeduct);
 
       const smsInfo = await twilioClient.messages.create({
         body: mobileContent,
@@ -69,7 +74,11 @@ const successfulDeposit = async (ctx) => {
       });
       console.log(info);
     } else if (notifType === "mobile") {
-      const mobileContent = successfulMobileMessage(user, amountToDeduct)
+      const mobileContent = successfulMobileMessage(
+        user,
+        amountToDeduct,
+        newBalance
+      );
       const smsInfo = await twilioClient.messages.create({
         body: mobileContent,
         from: +13203226382,
@@ -86,7 +95,36 @@ const successfulDeposit = async (ctx) => {
     console.log(err, "from notif service");
   }
 };
+
+const creditAlert = async (ctx) => {
+  const { user, amount, notifType } = ctx.params;
+  if (!user || !amount) {
+    return console.error("Invalid arguments passed in notif function");
+  }
+  if(notifType === 'mobile'){
+    const mobileContent = successfulCreditMessage(user, amount);
+    const smsInfo = await twilioClient.messages.create({
+      body: mobileContent,
+      from: +13203226382,
+      to: Number(user.phone),
+    });
+    console.log("SMS sent", smsInfo);
+  }else {
+    const emailContent = successfulCreditMessage(user, amount);
+    const info = await transporter.sendMail({
+      from: "<maddison53@ethereal.email>",
+      to: user.email,
+      subject: "Email notification",
+      html: emailContent,
+    });
+    console.log("Email sent", info);
+  }
+
+ 
+ 
+};
 module.exports = {
   sendInsufficientNotifToUser,
   successfulDeposit,
+  creditAlert
 };

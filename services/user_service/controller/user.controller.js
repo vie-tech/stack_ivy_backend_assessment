@@ -1,6 +1,9 @@
 const User = require("../model/user.model").User;
 const responseHandler = require("../../../handlers/response.handler");
 const mongoose = require('mongoose')
+
+
+
 const createUser = async (ctx) => {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -22,8 +25,8 @@ const createUser = async (ctx) => {
         return responseHandler.conflict(ctx);
       }
   
-      const newUser = new User({ username, password, phone, email });
-      await newUser.save({ session });
+      const newUser = await new User({ username, password, phone, email });
+     
   
       const token = await ctx.call("authentication.generateToken", {
         id: newUser._id,
@@ -37,11 +40,11 @@ const createUser = async (ctx) => {
         return responseHandler.error(ctx);
       }
   
-     const value = await ctx.call("wallet.createWallet", {
+      await ctx.call("wallet.createWallet", {
         owner: newUser._id,
       });
-
-      if(!value.success) return responseHandler.error(ctx)
+      
+       await newUser.save({ session });
       await session.commitTransaction();
       session.endSession();
   
@@ -51,8 +54,9 @@ const createUser = async (ctx) => {
       };
 
       
-     
-      return responseHandler.ok(ctx)
+       
+      return {newUser}
+      
     } catch (err) {
       await session.abortTransaction();
       session.endSession();
@@ -63,6 +67,7 @@ const createUser = async (ctx) => {
 
 const getUserBalance = async (ctx) => {
   try {
+    console.log(ctx.meta.user.id)
     const { username } = ctx.params;
     console.log(username);
     if (!username) return console.log("Username not passed");
@@ -91,6 +96,7 @@ const userLogin = async (ctx) => {
     });
     if (!token)
       return console.log(`Could not generate token (from user service)`);
+
     ctx.meta.$responseHeaders = {
       "Set-Cookie": `token=${token}; HttpOnly; Path=/; Max-Age=3600`,
     };

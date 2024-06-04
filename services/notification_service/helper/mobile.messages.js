@@ -7,8 +7,8 @@ const failedMobileMessage = (user, amountToDeduct)=>{
 const successfulMobileMessage = (user, amountToDeduct, newBalance)=>{
     const message = `[ALERT: Mobile notification] 
     Dear ${user.username},  $${amountToDeduct} has been
-     deducted from your account successfully
-     you new balance is $${newBalance}
+    deducted from your account successfully
+    you new balance is $${newBalance}
      `;
 
      return message
