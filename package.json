@@ -19,7 +19,6 @@
     "moleculer": "^0.14.33",
     "moleculer-web": "^0.10.7",
     "mongoose": "^8.4.1",
-    "moongoose": "^0.0.5",
     "nats": "^2.26.0",
     "nodemailer": "^6.9.13",
     "twilio": "^5.1.0"
