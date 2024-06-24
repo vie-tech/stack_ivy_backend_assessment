@@ -1,0 +1,27 @@
+const CREATE_USERS_TABLE = `CREATE TABLE IF NOT EXISTS accounts (
+   id SERIAL PRIMARY KEY,
+   username VARCHAR(255) NOT NULL UNIQUE,
+   email VARCHAR(255) NOT NULL UNIQUE,
+   phone VARCHAR(20) NOT NULL UNIQUE,
+   password VARCHAR(255) NOT NULL
+);`;
+
+const CREATE_WALLET_TABLE = `CREATE TABLE IF NOT EXISTS wallet (
+   id SERIAL PRIMARY KEY,
+   balance INT NOT NULL DEFAULT 0,
+   owner_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE
+);`;
+
+const SEARCH_QUERY_SIGNUP = 'SELECT * FROM accounts WHERE username=$1 OR email=$2 OR phone=$3';
+const INSERT_QUERY_SIGNUP = 'INSERT INTO accounts (username, email, phone, password) VALUES ($1, $2, $3, $4) RETURNING id';
+const INSERT_QUERY_CREATE_WALLET = 'INSERT INTO wallet (owner_id) VALUES ($1)';
+const SEARCH_LOGIN_QUERY = `SELECT * FROM accounts WHERE username=$1`;
+
+module.exports = {
+   CREATE_USERS_TABLE,
+   CREATE_WALLET_TABLE,
+   SEARCH_QUERY_SIGNUP,
+   INSERT_QUERY_SIGNUP,
+   INSERT_QUERY_CREATE_WALLET,
+   SEARCH_LOGIN_QUERY
+};
