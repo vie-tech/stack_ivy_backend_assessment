@@ -2,19 +2,30 @@ const express = require('express')
 const app = express()
 const {notificationHandler }= require('./broker/broker')
 
-const listenForMessage = async()=>{
-    try{
-        const response =  await notificationHandler.handleSignupNotification()
-        console.log(response)
-    }catch(err){
-        console.log(err.mesaage)
-    }
- 
+
+
+const startService = ()=>{
+  notificationHandler.handleSignupNotification().catch((err) => {
+    console.error("Error sending signup notification:", err);
+  });
+
+  notificationHandler.handleFailedNotification().catch((err) => {
+    console.error("Error sending failed notification:", err.message);
+  });
+  notificationHandler.handleSuccessfulNotification().catch((err) => {
+    console.error("Error sending success notification:", err.message);
+  });
+  notificationHandler.handleSuccessCreditNotification().catch((err) => {
+    console.error("Error sending success notification:", err.message);
+  });
+  notificationHandler.handleFailedCreditNotification().catch((err) => {
+    console.error("Error sending success notification:", err.message);
+  });
 }
 
-app.listen(6000, async()=>{
-    console.log('Notification service is up')
-   await listenForMessage()
+startService()
 
-})
+
+
+ 
 

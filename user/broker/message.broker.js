@@ -4,18 +4,19 @@ class MessageBroker {
   #queueName;
 
   constructor() {
-    this.#queueName = "signup_notification";
-    this.connection = null;
+        this.connection = null;
     this.channel = null;
   }
 
   async connect() {
     try {
+      const queueName = 'signup_notification'
+
       this.connection = await amqplib.connect(
         "amqps://auloxund:5p4s0rHOLoJsBE7Te0E2ECUegAzprTE5@sparrow.rmq.cloudamqp.com/auloxund"
       );
       this.channel = await this.connection.createChannel();
-      await this.channel.assertQueue(this.#queueName, { durable: false });
+      await this.channel.assertQueue(queueName, { durable: false });
       console.log("Message broker connected");
     } catch (error) {
       console.error("Error connecting to message broker:", error.message);
@@ -28,8 +29,9 @@ class MessageBroker {
       if (!this.channel) {
         await this.connect();
       }
-
-      this.channel.sendToQueue(this.#queueName, Buffer.from(email));
+      const queueName = 'signup_notification'
+      this.channel.assertQueue(queueName, {durable: false})
+      this.channel.sendToQueue(queueName, Buffer.from(email));
       console.log("Message sent to:", email);
       return true;
     } catch (err) {
